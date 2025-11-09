@@ -13,7 +13,7 @@
 - ⚡ 超過 50 萬字技術細節
 
 [🚀 開始閱讀](README.md)
-[📖 章節導航](小語言模型訓練手冊/索引.md)
+[📖 章節導航](docs/索引.md)
 [⭐ GitHub](https://github.com/Heng-xiu/smol_training_playbook_zh_tw)
 
 ![color](#FF6B6B)
