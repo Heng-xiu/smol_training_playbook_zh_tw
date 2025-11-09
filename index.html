@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>小語言模型訓練手冊 - SmolLM Training Playbook</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="完整的大語言模型訓練實戰指南，由 Hugging Face 團隊基於訓練 SmolLM3 的真實經驗撰寫。涵蓋預訓練、後訓練、基礎設施的完整技術棧。">
+  <meta name="keywords" content="LLM,大語言模型,訓練,SmolLM,Hugging Face,預訓練,後訓練,GPU,繁體中文">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="小語言模型訓練手冊">
+  <meta property="og:description" content="完整的大語言模型訓練實戰指南">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="小語言模型訓練手冊">
+  <meta property="twitter:description" content="完整的大語言模型訓練實戰指南">
+
+  <!-- Theme -->
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --base-font-size: 16px;
+      --theme-color: #FF6B6B;
+      --theme-color-dark: #FF5252;
+    }
+
+    /* 改善中文字體 */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "微軟正黑體", "PingFang TC", "Helvetica Neue", Arial, sans-serif;
+      font-size: var(--base-font-size);
+      line-height: 1.8;
+    }
+
+    /* 改善程式碼區塊 */
+    code {
+      font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+    }
+
+    /* 側邊欄優化 */
+    .sidebar {
+      border-right: 1px solid #eee;
+    }
+
+    .sidebar-nav > ul > li > a {
+      font-weight: 600;
+      font-size: 1.05em;
+    }
+
+    /* 表格優化 */
+    table {
+      display: block;
+      width: 100%;
+      overflow: auto;
+      border-collapse: collapse;
+    }
+
+    table th {
+      font-weight: 600;
+      background-color: #f6f8fa;
+    }
+
+    table th,
+    table td {
+      padding: 6px 13px;
+      border: 1px solid #dfe2e5;
+    }
+
+    /* 引用區塊優化 */
+    blockquote {
+      border-left: 4px solid var(--theme-color);
+      background-color: #f9f9f9;
+      padding: 10px 20px;
+      margin: 0 0 20px;
+    }
+
+    /* 標題錨點 */
+    .anchor span {
+      color: var(--theme-color);
+    }
+
+    /* 改善深色模式 */
+    body.close .sidebar,
+    body.close .sidebar-toggle {
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">載入中...</div>
+
+  <script>
+    window.$docsify = {
+      // 基本配置
+      name: '小語言模型訓練手冊',
+      repo: 'Heng-xiu/smol_training_playbook_zh_tw',
+
+      // 封面頁
+      coverpage: true,
+      onlyCover: false,
+
+      // 側邊欄
+      loadSidebar: true,
+      auto2top: true,
+      maxLevel: 4,
+      subMaxLevel: 3,
+
+      // 導航欄（可選）
+      loadNavbar: false,
+
+      // 搜尋功能
+      search: {
+        maxAge: 86400000, // 24 小時過期
+        paths: 'auto',
+        placeholder: '🔍 搜尋',
+        noData: '😞 找不到結果',
+        depth: 6,
+        hideOtherSidebarContent: false,
+      },
+
+      // 字數統計
+      count: {
+        countable: true,
+        fontsize: '0.9em',
+        color: 'rgb(90,90,90)',
+        language: 'chinese'
+      },
+
+      // 分頁導航
+      pagination: {
+        previousText: '上一頁',
+        nextText: '下一頁',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+
+      // 複製程式碼
+      copyCode: {
+        buttonText: '複製',
+        errorText: '錯誤',
+        successText: '已複製!'
+      },
+
+      // 標籤頁
+      tabs: {
+        persist    : true,
+        sync       : true,
+        theme      : 'classic',
+        tabComments: true,
+        tabHeadings: true
+      },
+
+      // Emoji 支援
+      emoji: true,
+
+      // 外部連結新視窗開啟
+      externalLinkTarget: '_blank',
+
+      // 執行腳本
+      executeScript: true,
+
+      // 404 頁面
+      notFoundPage: {
+        '/': '_404.md',
+      },
+
+      // 滾動到頂部
+      scrollToTop: {
+        auto: true,
+        text: '回到頂部',
+        right: 15,
+        bottom: 15,
+        offset: 500
+      },
+
+      // 字體設定
+      relativePath: true,
+
+      // 靈活警報
+      'flexible-alerts': {
+        style: 'flat',
+        note: {
+          label: '提示'
+        },
+        tip: {
+          label: '小技巧'
+        },
+        warning: {
+          label: '警告'
+        },
+        attention: {
+          label: '注意'
+        }
+      },
+
+      // 圖片縮放
+      zoom: {
+        background: {
+          R: 255,
+          G: 255,
+          B: 255,
+          A: 0.95
+        },
+        transform: {
+          scale: 1.2
+        }
+      }
+    }
+  </script>
+
+  <!-- Docsify 核心 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+
+  <!-- 搜尋插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+
+  <!-- Emoji 插件 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+
+  <!-- 外部腳本 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/external-script.min.js"></script>
+
+  <!-- 圖片縮放 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+
+  <!-- 複製程式碼 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+
+  <!-- 分頁導航 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+
+  <!-- 字數統計 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-count/dist/countable.min.js"></script>
+
+  <!-- 標籤頁 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+
+  <!-- 回到頂部 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-scroll-to-top/dist/docsify-scroll-to-top.min.js"></script>
+
+  <!-- 靈活警報 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-plugin-flexible-alerts"></script>
+
+  <!-- 語法高亮 - Python -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
+
+  <!-- 語法高亮 - Bash -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+
+  <!-- 語法高亮 - YAML -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+
+  <!-- 語法高亮 - JSON -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+
+  <!-- 語法高亮 - Markdown -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+
+  <!-- Google Analytics (可選 - 請替換成您的 GA ID) -->
+  <!--
+  <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <script async src='https://www.google-analytics.com/analytics.js'></script>
+  -->
+</body>
+</html>
